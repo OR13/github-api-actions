@@ -1,0 +1,37 @@
+name: "GitHub Discussions"
+description: |
+  Access GitHub GraphQL API for Discussions
+  See: https://docs.github.com/en/graphql
+inputs:
+  access-token:
+    description: |
+      A github personal access token.
+      Make sure it has been authorized for the following scopes:
+      public_repo write:discussion read:discussion
+    require: true
+
+  owner:
+    description: |
+      GitHub username or organization for the repo.
+  repo:
+    description: |
+      GitHub repository name
+  category:
+    description: |
+      GitHub Discussion Category
+    default: "Announcements"
+  title:
+    description: |
+      Discussion post title
+  body:
+    description: |
+      Discussion post body
+
+outputs:
+  json:
+    description: "The output in as json."
+  text:
+    description: "The output in as text."
+runs:
+  using: "node16"
+  main: "dist/index.js"

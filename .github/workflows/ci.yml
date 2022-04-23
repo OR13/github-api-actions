@@ -1,0 +1,48 @@
+name: CI
+
+on: [push]
+
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    name: Checkout
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Cache Save
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./*
+          key: ${{ github.sha }}
+
+  post_discussion:
+    needs:
+      - checkout
+    runs-on: ubuntu-latest
+    name: Post Discussion
+    outputs:
+      json: ${{ steps.read.outputs.json }}
+    steps:
+      - name: Cache Restore
+        uses: actions/cache@v2
+        id: cache-restore
+        with:
+          path: |
+            ./*
+          key: ${{ github.sha }}
+
+      - name: Post Discussion
+        uses: ./
+        id: post
+        with:
+          access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          owner: "OR13",
+          repo: "github-discussions",
+          category: "Announcements",
+          title: "hello 2",
+          body: "hello from the command liiiiiiiiiine!!!!",
+
+      - name: Review the results
+        run: |-
+          echo "${{ steps.post.outputs.text }}"
