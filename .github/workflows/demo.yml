@@ -1,0 +1,26 @@
+name: Demo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    name: Post Discussion
+    steps:
+      - name: Post Discussion
+        uses: or13/github-discussions@v0.0.1
+        id: post
+        with:
+          access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          owner: "OR13"
+          repo: "github-discussions"
+          category: "Announcements"
+          title: "hello 2"
+          body: "hello from the command liiiiiiiiiine!!!!"
+
+      - name: Review the Summary
+        run: |-
+          echo "${{ steps.post.outputs.text }}"
