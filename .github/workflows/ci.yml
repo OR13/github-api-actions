@@ -37,11 +37,11 @@ jobs:
         id: post
         with:
           access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          owner: "OR13",
-          repo: "github-discussions",
-          category: "Announcements",
-          title: "hello 2",
-          body: "hello from the command liiiiiiiiiine!!!!",
+          owner: "OR13"
+          repo: "github-discussions"
+          category: "Announcements"
+          title: "hello 2"
+          body: "hello from the command liiiiiiiiiine!!!!"
 
       - name: Review the results
         run: |-
