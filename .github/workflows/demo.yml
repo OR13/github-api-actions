@@ -11,7 +11,7 @@ jobs:
     name: Post Discussion
     steps:
       - name: Post Discussion
-        uses: or13/github-api-actions@v0.0.1
+        uses: or13/github-api-actions@v0.0.2
         id: post
         with:
           access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
