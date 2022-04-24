@@ -6525,17 +6525,85 @@ module.exports = getDiscussions;
 
 /***/ }),
 
+/***/ 29:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const { graphql } = __nccwpck_require__(467);
+
+const getTextFromRecentPublicActivity = (data) =>{
+  let finalText = '';
+  data.search.edges.sort((a, b)=>{
+      return a.node.mergedAt > b.node.mergedAt ? -1 : 1
+  }).forEach((e)=>{
+    finalText += `
+    "${e.node.title}" was merged on "${e.node.mergedAt}" into "${e.node.repository.nameWithOwner}",
+    ${e.node.changedFiles} files where changed, ${e.node.additions} additions where made, ${e.node.deletions} deletions where made.
+    `
+  })
+  return finalText;
+}
+
+const getRecentPublicActivity = async (options = {}) => {
+  const { accessToken, search, limit, text } = options;
+  const data = await graphql({
+    query: `
+    query topRepos($search: String!, $limit: Int!) {
+        search(query: $search, type: ISSUE, first: $limit) {
+          issueCount
+          edges {
+            node {
+              ... on PullRequest {
+                number
+                title
+                repository {
+                  nameWithOwner
+                }
+                createdAt
+                mergedAt
+                url
+                changedFiles
+                additions
+                deletions
+              }
+            }
+          }
+        }
+    }
+  `,
+    search,
+    limit,
+    headers: {
+      authorization: `token ${accessToken}`,
+    },
+  });
+
+  return data
+
+ 
+};
+
+module.exports = { getRecentPublicActivity, getTextFromRecentPublicActivity };
+
+
+/***/ }),
+
 /***/ 923:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const createDiscussion = __nccwpck_require__(237);
 const getDiscussionCategories = __nccwpck_require__(311);
 const getDiscussions = __nccwpck_require__(663);
+const { getRecentPublicActivity, getTextFromRecentPublicActivity } = __nccwpck_require__(29);
+
+
+
 
 module.exports = {
   getDiscussionCategories,
   getDiscussions,
   createDiscussion,
+  getRecentPublicActivity,
+  getTextFromRecentPublicActivity
 };
 
 
@@ -6722,6 +6790,8 @@ const getOpts = () => {
     category: core.getInput("category"),
     title: core.getInput("title"),
     body: core.getInput("body"),
+    search: core.getInput("search"),
+    limit: parseInt(core.getInput("limit")),
   };
 };
 
@@ -6732,6 +6802,11 @@ async function run() {
       const response = await lib.createDiscussion(opts);
       core.setOutput("json", JSON.stringify(response));
       core.setOutput("text", response.createDiscussion.discussion.url);
+    }
+    if (opts.accessToken && opts.search) {
+      const response = await lib.getRecentPublicActivity(opts);
+      core.setOutput("json", JSON.stringify(response));
+      core.setOutput("text", lib.getTextFromRecentPublicActivity(response));
     }
   } catch (error) {
     core.setFailed(error.message);
