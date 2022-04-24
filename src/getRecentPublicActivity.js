@@ -1,6 +1,19 @@
 const { graphql } = require("@octokit/graphql");
 
-const getWeeklyActivity = async (options = {}) => {
+const getTextFromRecentPublicActivity = (data) =>{
+  let finalText = '';
+  data.search.edges.sort((a, b)=>{
+      return a.node.mergedAt > b.node.mergedAt ? -1 : 1
+  }).forEach((e)=>{
+    finalText += `
+    "${e.node.title}" was merged on "${e.node.mergedAt}" into "${e.node.repository.nameWithOwner}",
+    ${e.node.changedFiles} files where changed, ${e.node.additions} additions where made, ${e.node.deletions} deletions where made.
+    `
+  })
+  return finalText;
+}
+
+const getRecentPublicActivity = async (options = {}) => {
   const { accessToken, search, limit, text } = options;
   const data = await graphql({
     query: `
@@ -34,21 +47,9 @@ const getWeeklyActivity = async (options = {}) => {
     },
   });
 
-  if (!text){
-      return data
-  }
+  return data
 
-  let finalText = '';
-  data.search.edges.sort((a, b)=>{
-      return a.node.mergedAt > b.node.mergedAt ? -1 : 1
-  }).forEach((e)=>{
-    finalText += `
-    "${e.node.title}" was merged on "${e.node.mergedAt}" into "${e.node.repository.nameWithOwner}",
-    ${e.node.changedFiles} files where changed, ${e.node.additions} additions where made, ${e.node.deletions} deletions where made.
-    `
-  })
-
-  return finalText;
+ 
 };
 
-module.exports = getWeeklyActivity;
+module.exports = { getRecentPublicActivity, getTextFromRecentPublicActivity };

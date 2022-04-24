@@ -1,7 +1,7 @@
 const createDiscussion = require("./createDiscussion");
 const getDiscussionCategories = require("./getDiscussionCategories");
 const getDiscussions = require("./getDiscussions");
-const getWeeklyActivity = require("./getWeeklyActivity");
+const { getRecentPublicActivity, getTextFromRecentPublicActivity } = require("./getRecentPublicActivity");
 
 
 
@@ -10,5 +10,6 @@ module.exports = {
   getDiscussionCategories,
   getDiscussions,
   createDiscussion,
-  getWeeklyActivity
+  getRecentPublicActivity,
+  getTextFromRecentPublicActivity
 };

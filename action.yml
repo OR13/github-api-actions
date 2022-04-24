@@ -26,6 +26,17 @@ inputs:
   body:
     description: |
       Discussion post body
+  
+  search:
+    description: |
+      Search query
+  
+  limit:
+    description: |
+      Number of results to return
+    default: 10
+
+  
 
 outputs:
   json:

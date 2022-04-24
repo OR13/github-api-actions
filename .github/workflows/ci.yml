@@ -15,6 +15,34 @@ jobs:
           path: |
             ./*
           key: ${{ github.sha }}
+  
+  recent_activity:
+    needs:
+      - checkout
+    runs-on: ubuntu-latest
+    name: Recent Activity
+    outputs:
+      json: ${{ steps.recent_activity.outputs.json }}
+    steps:
+      - name: Cache Restore
+        uses: actions/cache@v2
+        id: cache-restore
+        with:
+          path: |
+            ./*
+          key: ${{ github.sha }}
+
+      - name: Get Activvity
+        uses: ./
+        id: recent_activity
+        with:
+          access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          search: "is:merged is:pr is:public archived:false author:OR13 -user:OR13"
+          limit: 10
+
+      - name: Review the results
+        run: |-
+          echo "${{ steps.recent_activity.outputs.text }}"
 
   post_discussion:
     needs:
